@@ -4,6 +4,7 @@ const port = 5000
 const bodyParser = require('body-parser');
 const { User } = require('./models/User');
 const cookieParser = require('cookie-parser');
+const {auth} = require('./middleware/auth');
 
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -18,7 +19,7 @@ useNewUrlParser:true, useUnifiedTopology:true, useCreateIndex:true, useFindAndMo
 
 app.get('/', (req,res)=>res.send('npm install nodemon--save-dev'))
 
-app.post('/register',(req,res)=>{
+app.post('/api/users/register',(req,res)=>{
     //회원가입시 필요 정보를 client에서 받아오면
     //그것을 db에 넣음.
     const user = new User(req.body)
@@ -30,7 +31,7 @@ app.post('/register',(req,res)=>{
 })
 
 //login 기능
-app.post('/login', (req,res)=>{
+app.post('/api/users/login', (req,res)=>{
     //요청된 이메일을 데이터베이스에서 찾기
     User.findOne({ email:req.body.email }, (err, user)=>{
         if(!user){
@@ -55,6 +56,32 @@ app.post('/login', (req,res)=>{
             })
         })
     })
+})
+
+app.get('/api/users/auth', auth, (req,res)=>{
+    // 미들웨어 통과 => Authentication : True
+    // role : 0 => 일반유저
+    res.status(200).json({
+        _id: req.user._id,
+        isAdmin: req.user.role === 0 ? false : true,
+        isAuth:true,
+        email: req.user.email,
+        name: req.user.name,
+        lastname: req.user.lastname,
+        role: req.user.role,
+        image: req.user.image
+    })
+})
+
+app.get('/api/users/logout', auth, (req, res)=>{
+    User.findOneAndUpdate(
+        {_id: req.user._id},
+        {token:""}, (err,user) => {
+            if(err) return res.json({ success: false, err});
+            return res.status(200).send({
+                success:true
+            })
+        })
 })
 
 app.listen(port, ()=>console.log(`Example app ${port}`))
