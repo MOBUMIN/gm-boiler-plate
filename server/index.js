@@ -19,6 +19,10 @@ useNewUrlParser:true, useUnifiedTopology:true, useCreateIndex:true, useFindAndMo
 
 app.get('/', (req,res)=>res.send('npm install nodemon--save-dev'))
 
+app.get('/api/hello', (req,res)=>{
+    res.send("안뇽")
+})
+
 app.post('/api/users/register',(req,res)=>{
     //회원가입시 필요 정보를 client에서 받아오면
     //그것을 db에 넣음.
