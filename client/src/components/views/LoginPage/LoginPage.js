@@ -26,11 +26,15 @@ function LoginPage(props) {
         dispatch(loginUser(body))
         .then(response=>{
             if(response.payload.loginSuccess){
+                alert('로그인 성공')
                 props.history.push('/')
             } else{
                 alert('error')
             }
         })
+    }
+    const onBackHandler=()=>{
+        props.history.push('/')
     }
     return (
         <div style={{
